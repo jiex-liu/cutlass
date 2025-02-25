@@ -174,8 +174,10 @@ public:
     // Map worker's linear index into the CTA tiled problem shape to the corresponding MNL indices
     uint64_t work_idx_l, remainder;
     scheduler_params.divmod_batch_(work_idx_l, remainder, linear_idx);
+    // remainder == linear_idx
 
     uint64_t blk_per_grid_dim = scheduler_params.divmod_cluster_shape_minor_.divide(remainder);
+    // blk_per_grid_dim = linear_idx // cluster_shape_minor
 
     auto [work_idx_m, work_idx_n] = Subclass::get_work_idx_m_and_n(blk_per_grid_dim,
                                                          scheduler_params.divmod_cluster_shape_major_,

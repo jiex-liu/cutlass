@@ -87,6 +87,9 @@ public:
 
     uint64_t cluster_id, cluster_major_offset = 0, cluster_minor_offset = 0;
     divmod_cluster_shape_major(cluster_id, cluster_major_offset, blk_per_grid_dim);
+    // cluster_id = divmod(cluster_major_offset, blk_per_grid_dim)
+    //    cluster_id = blk_per_grid_dim // divmod_cluster_shape_major
+    //    cluster_major_offset = blk_per_grid_dim % divmod_cluster_shape_major 
 
     if (raster_order == RasterOrder::AlongN) {
       cluster_minor_offset = cta_m_in_cluster;
@@ -101,10 +104,15 @@ public:
 
     offset = cluster_id & ((1 << log_swizzle_size) - 1);
     extra = cluster_id >> log_swizzle_size;
+    // offset == 0
+    // extra == cluster_id
 
     divmod_cluster_blk_major(cluster_idx_minor_div_swizzle, cluster_idx_major, extra);
+    // cluster_idx_minor_div_swizzle = extra / divmod_cluster_blk_major.divisor
+    // cluster_idx_major = cluster_idx_minor_div_swizzle % divmod_cluster_blk_major.divisor
 
     cluster_idx_minor = cluster_idx_minor_div_swizzle * (1 << log_swizzle_size) + offset;
+    // cluster_idx_minor = cluster_idx_minor_div_swizzle
 
     auto minor_work_idx = static_cast<int32_t>(cluster_idx_minor * divmod_cluster_shape_minor.divisor +
                                                cluster_minor_offset);
